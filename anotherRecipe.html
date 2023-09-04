@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body{
+        color:white;
+        margin:0;
+        padding:0;
+        box-sizing: border-box;
+        background-color: black;
+    }
+    #container{
+        
+        /* background-color: black; */
+        display: flex;
+        justify-content:space-between;
+        align-items: center;
+        margin-top: 30px;
+
+    }
+    img{
+        width:300px;
+        margin-left:25px
+    }
+    #open-close{
+        display: none;
+        border-radius: 5px;
+        background-color: black;
+        color: white;
+        border: 2px solid grey;
+        margin-left: 20px;
+    }
+    input{
+        width:100px;
+        height:30px;
+        margin-left: 50px;
+        margin-top: 50px;
+    }
+    #recipe-instruction{
+        display:block;
+        margin:15px
+    }
+    .view{
+        display:block
+    }
+    .close{
+        display:none
+    }
+</style> 
+<body>
+<div id="container">
+    <div id="pic-container">
+        <input id="userInput" type="text">
+        <button id="searchBtn">Search</button>
+        <h3 id="item-name"></h3>
+        <h3 id="item-area"></h3> 
+    </div>
+<hr>
+    <div id="recipe">
+        <div id="mm">
+            <h3 style="margin-left: 20px;">ingredients:</h3>
+        </div>
+        <h3 style="margin-left: 20px;">instructions:</h3>
+        <button id="open-close">Close Instructions</button>
+        <div id="recipe-instruction"></div>
+    </div>
+</div>
+
+    <script>
+          let searchButton = document.getElementById("searchBtn")
+          let imgCon = document.getElementById("pic-container")
+          let itemName = document.getElementById("item-name")
+          let url = "https://www.themealdb.com/api/json/v1/1/search.php?s=";
+          let recipe = document.getElementById("recipe")
+          let instructio = document.getElementById("recipe-instruction")
+          let list = document.getElementById("mm")
+
+          searchButton.addEventListener("click", () => {
+            let userInput = document.getElementById("userInput")
+            // let url = "https://www.themealdb.com/api/json/v1/1/search.php?s=";
+            if(userInput.value == ""){
+                itemName.innerHTML = "Try to write your recipe"
+            }else{
+                fetch(url + userInput.value).then(function(response){
+                    return response.json()
+                }).then(function(data){
+                userInput.style.display = "block"
+                    let allMeal = data.meals[0]
+                    console.log(allMeal)
+                    console.log(allMeal.strMeal)
+                    console.log(allMeal.strArea)
+ 
+                    let count = 1
+                    let ingredients = []
+                    for(let i in allMeal){
+                        let ingredient
+                        let measure
+
+                        if(i.startsWith('strIngredient')&&allMeal[i]){
+                            ingredient = allMeal[i]
+                            measure = allMeal['strMeasure' + count]
+                            count++
+                            ingredients.push(`${ingredient} ${measure}`)
+                         }
+                        imgCon.innerHTML = `<img src=${allMeal.strMealThumb}>`
+                        itemName.innerHTML = allMeal.strMeal
+                    }
+
+                    // imgCon.innerHTML = `<img src=${allMeal.strMealThumb}`
+
+                    let parent = document.createElement("ul")
+                    ingredients.forEach(function(i){
+                        let listItem = document.createElement("ul")
+                        listItem.innerHTML = i
+                        parent.appendChild(listItem)
+                    })
+                    list.appendChild(parent)
+                    instructio.innerHTML = allMeal.strInstructions
+                    instructio.style.display = "block"
+
+
+                    let closeOpen = document.getElementById("open-close")
+                    closeOpen.style.display="block"
+                    closeOpen.addEventListener("click", () =>{
+                        if(instructio.style.display == "block"){
+                            instructio.style.display = "none"
+                        }else{
+                            instructio.style.display = "block"
+                        }
+                    })
+
+                })
+            }
+          })
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
